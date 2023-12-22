@@ -7,7 +7,7 @@ public class Coordinator {
 
     String text = "";
 
-    public ArrayList<ArrayList<String>> splitList(ArrayList<String> listPhrases, int nbWorkers){
+    public static ArrayList<ArrayList<String>> splitList(ArrayList<String> listPhrases, int nbWorkers){
         ArrayList<ArrayList<String>> result = new ArrayList<>();
 
         int sublistSize = listPhrases.size() / nbWorkers;
