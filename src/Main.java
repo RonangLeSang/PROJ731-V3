@@ -10,8 +10,9 @@ public class Main {
         return workers;
     }
 
-    public static void startWorkers(ArrayList<Mapper> workers, ArrayList<ArrayList<String>> splittedWork){
+    public static void startWorkers(ArrayList<Mapper> workers, ArrayList<ArrayList<String>> splittedWork, int nbReducer){
         for(int i = 0; i < workers.size(); i++){
+            workers.get(i).setNbReducer(nbReducer);
             workers.get(i).setText(splittedWork.get(i));
             workers.get(i).start();
         }
@@ -27,9 +28,22 @@ public class Main {
         }
     }
 
+    public static ArrayList<Reducer> createReducer(int nbReducer){
+        ArrayList<Reducer> reducers = new ArrayList<Reducer>();
+        for(int i = 0; i < nbReducer; i++){
+            reducers.add(new Reducer());
+        }
+        return reducers;
+    }
+
+    public static void startReducer(ArrayList<Mapper> workers, ArrayList<Reducer> reducers){
+
+    }
+
     public static void main(String[] args) {
 
-        int nbWorkers = 2;
+        int nbWorkers = 3;
+        int nbReducer = 2;
 
         Coordinator coordinator = new Coordinator();
         String text = coordinator.read("data/text_AnewYou.txt");
@@ -40,9 +54,8 @@ public class Main {
 
         ArrayList<ArrayList<String>> splittedWork = Coordinator.splitList(splittedSentences, nbWorkers);
 
-        startWorkers(workers, splittedWork);
+        startWorkers(workers, splittedWork, nbReducer);
 
-        // Wait for both threads to finish
         isFinished(workers);
 
 //        ArrayList<HashMap<String, Integer>> hashList = new ArrayList<HashMap<String, Integer>>();
