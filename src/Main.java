@@ -75,7 +75,7 @@ public class Main {
         int nbReducer = 2;
 
         Coordinator coordinator = new Coordinator();
-        String text = coordinator.read("data/text_AnewYou.txt");
+        String text = coordinator.read("data/bible.txt");
         Splitter splitter = new Splitter();
         ArrayList<String> splittedSentences = splitter.splitPhrases(splitter.normalization(text));
 

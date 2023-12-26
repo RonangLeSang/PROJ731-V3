@@ -39,7 +39,6 @@ public class Coordinator {
                 res.get(hash % nbReducer).put(key, hashMapToSplit.get(key));
             }
         }
-        System.out.println(res);
         return res;
     }
 
