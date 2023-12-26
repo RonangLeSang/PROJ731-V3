@@ -8,7 +8,7 @@ public class Splitter {
 
     public String normalization (String text) {
         text = text.replaceAll("[\\s&&[^\\n]]+", " ").replaceAll("\\s*,\\s*", ", ").replaceAll("\\s*\\.[\\s&&[^\n]]*", ". ").
-                replaceAll("\\s*:\\s*", ": ").replaceAll("\\n+", "\n").replaceAll("^\n|\n$", "").replaceAll("[^\\sa-zA-Z0-9.]", "");
+                replaceAll("\\s*:\\s*", ": ").replaceAll("\\n+", "\n").replaceAll("^\n|\n$", " ").replaceAll("\\?"," ").replaceAll("[^\\sa-zA-Z0-9.]", " ");
         text = text.toLowerCase();
         return text;
     }

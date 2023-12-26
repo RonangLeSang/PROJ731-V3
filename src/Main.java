@@ -93,7 +93,8 @@ public class Main {
 
         isReducerFinished(reducers);
 
-        System.out.println(join(reducers));
+        HashMap<String, Integer> res = join(reducers);
+        System.out.println(res);
 
     }
 }
