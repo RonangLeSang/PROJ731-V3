@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main {
 
@@ -18,10 +19,20 @@ public class Main {
         }
     }
 
-    public static void isFinished(ArrayList<Mapper> workers){
+    public static void isWorkerFinished(ArrayList<Mapper> workers){
         try{
             for(Mapper worker : workers){
                 worker.join();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void isReducerFinished(ArrayList<Reducer> reducers){
+        try{
+            for(Reducer reducer : reducers){
+                reducer.join();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -36,8 +47,26 @@ public class Main {
         return reducers;
     }
 
-    public static void startReducer(ArrayList<Mapper> workers, ArrayList<Reducer> reducers){
+    public static void setReducers(ArrayList<Mapper> workers, ArrayList<Reducer> reducers, int nbReducer){
+        for(int i = 0; i < workers.size(); i++){
+            for(int j = 0; j < nbReducer; j++){
+                reducers.get(j).addHashMap(workers.get(i).getShuffledResult().get(j));
+            }
+        }
+    }
 
+    public static void startReducers(ArrayList<Reducer> reducers){
+        for(Reducer reducer : reducers){
+            reducer.start();
+        }
+    }
+
+    public static HashMap<String, Integer> join(ArrayList<Reducer> reducers){
+        HashMap<String, Integer> res = new HashMap<String, Integer>();
+        for(Reducer reducer : reducers){
+            res.putAll(reducer.getFullHashMap());
+        }
+        return res;
     }
 
     public static void main(String[] args) {
@@ -56,13 +85,15 @@ public class Main {
 
         startWorkers(workers, splittedWork, nbReducer);
 
-        isFinished(workers);
+        isWorkerFinished(workers);
 
-//        ArrayList<HashMap<String, Integer>> hashList = new ArrayList<HashMap<String, Integer>>();
-//        hashList.add(mapper1.getWordCount());
-//        hashList.add(mapper2.getWordCount());
-//
-//        Reducer reduce = new Reducer(hashList);
-//        System.out.println(reduce.testMerge());
+        ArrayList<Reducer> reducers = createReducer(nbReducer);
+        setReducers(workers, reducers, nbReducer);
+        startReducers(reducers);
+
+        isReducerFinished(reducers);
+
+        System.out.println(join(reducers));
+
     }
 }
