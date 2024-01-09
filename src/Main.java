@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.time.Duration;
+import java.time.Instant;
 public class Main {
 
     public static ArrayList<Mapper> createWorkers(int nbWorkers, ArrayList<Reducer> reducers){
@@ -62,12 +63,18 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int nbWorkers = 9;
-        int nbReducer = 3;
+        int nbWorkers = 1;
+        int nbReducer = 1;
+
+        System.out.println("pretreatment of text");
+        long timer_text_treatment_start = System.currentTimeMillis();
 
         Coordinator coordinator = new Coordinator();
         String text = coordinator.read("data/bible.txt");
         Splitter splitter = new Splitter();
+        long timer_text_treatment_end = System.currentTimeMillis();
+
+
         ArrayList<String> splittedSentences = splitter.splitPhrases(splitter.normalization(text));
 
         ArrayList<Reducer> reducers = createReducer(nbReducer);
@@ -76,16 +83,31 @@ public class Main {
 
         ArrayList<ArrayList<String>> splittedWork = Coordinator.splitList(splittedSentences, nbWorkers);
 
+        long timer_total_process_start = System.currentTimeMillis();
+        long timer_single_process_worker_start = System.currentTimeMillis();
+
         startWorkers(workers, splittedWork);
 
         isWorkerFinished(workers);
+
+        long timer_single_process_worker_end = System.currentTimeMillis();
+        long timer_single_process_reducer_start = System.currentTimeMillis();
 
         startReducers(reducers);
 
         isReducerFinished(reducers);
 
         HashMap<String, Integer> res = join(reducers);
+
+        long timer_single_process_reducer_end = System.currentTimeMillis();
+        long timer_total_process_end = System.currentTimeMillis();
+
         System.out.println(res);
+
+        System.out.println("Text pretreatment: " + (timer_text_treatment_end - timer_text_treatment_start) + " ms");
+        System.out.println("Workers timer: " + (timer_single_process_worker_end - timer_single_process_worker_start) + " ms");
+        System.out.println("Reducers timer: " + (timer_single_process_reducer_end - timer_single_process_reducer_start) + " ms");
+        System.out.println("Total time of the map reduce: " + (timer_total_process_end - timer_total_process_start) + " ms");
 
     }
 }
