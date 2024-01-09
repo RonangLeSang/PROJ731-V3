@@ -71,8 +71,8 @@ public class Main {
 
     public static void main(String[] args) {
 
-        int nbWorkers = 3;
-        int nbReducer = 2;
+        int nbWorkers = 9;
+        int nbReducer = 3;
 
         Coordinator coordinator = new Coordinator();
         String text = coordinator.read("data/bible.txt");
@@ -86,7 +86,7 @@ public class Main {
         startWorkers(workers, splittedWork, nbReducer);
 
         isWorkerFinished(workers);
-
+        
         ArrayList<Reducer> reducers = createReducer(nbReducer);
         setReducers(workers, reducers, nbReducer);
         startReducers(reducers);
