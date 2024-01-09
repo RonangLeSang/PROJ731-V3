@@ -6,21 +6,18 @@ public class Mapper extends Thread{
     private WordCounter counter;
     private HashMap<String, Integer> wordCount = null;
     private ArrayList<HashMap<String, Integer>> shuffledResult = null;
+    private int nbReducer;
+    private ArrayList<Reducer> reducers;
 
-    public Mapper(ArrayList<String> text, int nbReducer) {
-        this.counter = new WordCounter(text, nbReducer);
-    }
 
-    public Mapper() {
+    public Mapper(ArrayList<Reducer> reducers) {
+        nbReducer = reducers.size();
         this.counter = new WordCounter();
+        this.reducers = reducers;
     }
 
     public void setText(ArrayList<String> text){
         this.counter.setText(text);
-    }
-
-    public void setNbReducer(int nbReducer) {
-        this.counter.setNbReducer(nbReducer);
     }
 
     public HashMap<String, Integer> getWordCount() {
@@ -32,12 +29,19 @@ public class Mapper extends Thread{
     }
 
     private void shuffle(){
-        shuffledResult = Coordinator.shuffle(counter.getNbReducer(), wordCount);
+        shuffledResult = Coordinator.shuffle(nbReducer, wordCount);
+    }
+
+    public void initReducers(){
+        for(int j = 0; j < nbReducer; j++){
+            reducers.get(j).addHashMap(this.getShuffledResult().get(j));
+        }
     }
 
     @Override
     public void run() {
         this.wordCount = counter.count();
         shuffle();
+        initReducers();
     }
 }

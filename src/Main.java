@@ -3,17 +3,16 @@ import java.util.HashMap;
 
 public class Main {
 
-    public static ArrayList<Mapper> createWorkers(int nbWorkers){
+    public static ArrayList<Mapper> createWorkers(int nbWorkers, ArrayList<Reducer> reducers){
         ArrayList<Mapper> workers = new ArrayList<Mapper>();
         for(int i = 0; i < nbWorkers; i++){
-            workers.add(new Mapper());
+            workers.add(new Mapper(reducers));
         }
         return workers;
     }
 
-    public static void startWorkers(ArrayList<Mapper> workers, ArrayList<ArrayList<String>> splittedWork, int nbReducer){
+    public static void startWorkers(ArrayList<Mapper> workers, ArrayList<ArrayList<String>> splittedWork){
         for(int i = 0; i < workers.size(); i++){
-            workers.get(i).setNbReducer(nbReducer);
             workers.get(i).setText(splittedWork.get(i));
             workers.get(i).start();
         }
@@ -47,14 +46,6 @@ public class Main {
         return reducers;
     }
 
-    public static void setReducers(ArrayList<Mapper> workers, ArrayList<Reducer> reducers, int nbReducer){
-        for(int i = 0; i < workers.size(); i++){
-            for(int j = 0; j < nbReducer; j++){
-                reducers.get(j).addHashMap(workers.get(i).getShuffledResult().get(j));
-            }
-        }
-    }
-
     public static void startReducers(ArrayList<Reducer> reducers){
         for(Reducer reducer : reducers){
             reducer.start();
@@ -79,16 +70,16 @@ public class Main {
         Splitter splitter = new Splitter();
         ArrayList<String> splittedSentences = splitter.splitPhrases(splitter.normalization(text));
 
-        ArrayList<Mapper> workers = Main.createWorkers(nbWorkers);
+        ArrayList<Reducer> reducers = createReducer(nbReducer);
+
+        ArrayList<Mapper> workers = Main.createWorkers(nbWorkers, reducers);
 
         ArrayList<ArrayList<String>> splittedWork = Coordinator.splitList(splittedSentences, nbWorkers);
 
-        startWorkers(workers, splittedWork, nbReducer);
+        startWorkers(workers, splittedWork);
 
         isWorkerFinished(workers);
-        
-        ArrayList<Reducer> reducers = createReducer(nbReducer);
-        setReducers(workers, reducers, nbReducer);
+
         startReducers(reducers);
 
         isReducerFinished(reducers);
